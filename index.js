@@ -1,12 +1,13 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
 import 'dotenv/config'
+import cors from 'cors';
 
 const app = express();
 const port = 5000;
 
-
-
+app.use(cors())
+app.use(express.json())
 
 
 const client = new MongoClient(process.env.MONGODB_URI);
@@ -21,8 +22,28 @@ export async function connectToMongoDB() {
   }
 }
 
-connectToMongoDB();
+const mongoClient = await connectToMongoDB();
 
+const db = mongoClient.db("b14-booknook")
+const addCollectio = db.collection("add")
+
+
+app.post('/add-book', async (req, res) => {
+    const data = req.body
+
+    const result = await addCollectio.insertOne(data)
+
+    console.log(result);
+
+    res.send(result)
+})
+
+
+app.get('/all-books', async (req, res) => {
+
+    const result = await addCollectio.find().toArray()
+    res.send(result)
+})
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
