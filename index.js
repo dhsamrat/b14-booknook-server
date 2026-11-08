@@ -64,7 +64,13 @@ app.patch('/all-books/:id', async (req, res) =>{
     res.json(result)
 })
 
-
+app.delete('/all-book/:id', async (req, res)=>{
+     const {id} = req.params
+     const result = await addCollectio.deleteOne(
+         {_id: new ObjectId(id)},
+     )
+     res.json(result)
+})
 
 
 
