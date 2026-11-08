@@ -1,5 +1,5 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config'
 import cors from 'cors';
 
@@ -44,6 +44,31 @@ app.get('/all-books', async (req, res) => {
     const result = await addCollectio.find().toArray()
     res.send(result)
 })
+
+
+app.get('/all-books/:id', async (req, res) => {
+    const {id} = req.params
+    const result = await addCollectio.findOne({_id: new ObjectId(id)})
+
+    res.send(result)
+})
+
+
+app.patch('/all-books/:id', async (req, res) =>{
+    const {id} = req.params
+    const updatedData = req.body
+    const result = await addCollectio.updateOne(
+        {_id: new ObjectId(id)},
+        {$set:updatedData}
+    )
+    res.json(result)
+})
+
+
+
+
+
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
