@@ -84,11 +84,44 @@ app.post("/add-book", async (req, res) => {
 });
 
 
-app.get('/all-books', async (req, res) => {
+app.get("/all-books", async (req, res) => {
+  try {
+    const result = await addCollectio
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
 
-    const result = await addCollectio.find().toArray()
-    res.send(result)
-})
+    res.status(200).send(result);
+  } catch (error) {
+    console.error("Fetch all books error:", error);
+
+    res.status(500).send({
+      success: false,
+      message: "Failed to fetch books",
+    });
+  }
+});
+
+
+
+app.get("/latest-books", async (req, res) => {
+  try {
+    const result = await addCollectio
+      .find()
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .toArray();
+
+    res.status(200).send(result);
+  } catch (error) {
+    console.error("Fetch latest books error:", error);
+
+    res.status(500).send({
+      success: false,
+      message: "Failed to fetch latest books",
+    });
+  }
+});
 
 
 app.get('/all-books/:id', async (req, res) => {
