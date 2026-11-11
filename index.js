@@ -26,6 +26,7 @@ const mongoClient = await connectToMongoDB();
 
 const db = mongoClient.db("b14-booknook")
 const addCollectio = db.collection("add")
+const borrowcollection = db.collection("borrows")
 
 
 app.post('/add-book', async (req, res) => {
@@ -73,7 +74,51 @@ app.delete('/all-book/:id', async (req, res)=>{
 })
 
 
+app.post('/borrows', async (req, res)=>{
+     const data = req.body
+     const result = await borrowcollection.insertOne(data)
+     res.send(result)
+})
 
+app.get('/my-borrows/:email', async (req, res)=>{
+     const {email} = req.params
+     const result = await borrowcollection.find({email:email}).toArray()
+     res.send(result)
+
+})
+
+app.delete("/my-borrows/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).send({
+        message: "Invalid borrow ID",
+      });
+    }
+
+    const result = await borrowcollection.deleteOne({
+      _id: new ObjectId(id),
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send({
+        message: "Borrow record not found",
+      });
+    }
+
+    res.send({
+      message: "Book returned successfully",
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).send({
+      message: "Failed to return book",
+    });
+  }
+});
 
 
 app.get('/', (req, res) => {
